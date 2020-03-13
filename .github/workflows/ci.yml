@@ -44,6 +44,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - name: Cache
+        uses: actions/cache@v1
+        id: cache
+        with:
+          key: dialyzer
+          path: _build
+
       - name: Compile
         run: docker-compose build
 
