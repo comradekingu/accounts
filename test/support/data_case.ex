@@ -19,11 +19,13 @@ defmodule Accounts.DataCase do
   using do
     quote do
       alias Accounts.Repo
+      alias Accounts.Schema
 
+      import Accounts.DataCase
+      import Accounts.Factory
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Accounts.DataCase
     end
   end
 

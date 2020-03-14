@@ -13,11 +13,11 @@ defmodule Accounts.User do
   email and once the link in the email is clicked, we dispatch an event that
   causes the user to complete login.
   """
-  @spec login(User.t()) :: {:ok, User.t()} | {:error, :failed_dependency} | {:error, :not_found}
+  @spec login(User.t()) :: {:ok, UserToken.t()} | {:error, :failed_dependency} | {:error, :not_found}
   def login(%User{} = user) do
     with {:ok, token} <- UserToken.create(user, "login"),
          :ok <- send_email(token) do
-      {:ok, user}
+      {:ok, token}
     else
       {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
@@ -30,12 +30,12 @@ defmodule Accounts.User do
   registration process.
   """
   @spec create(String.t()) ::
-          {:ok, User.t()} | {:error, :failed_dependency} | {:error, :not_found}
+          {:ok, UserToken.t()} | {:error, :failed_dependency} | {:error, :not_found}
   def create(email) do
     with {:ok, user} <- User.create(email),
          {:ok, token} <- UserToken.create(user, "validate"),
          :ok <- send_email(token) do
-      {:ok, user}
+      {:ok, token}
     else
       {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
@@ -63,9 +63,7 @@ defmodule Accounts.User do
     |> Map.get(:user)
     |> UserToken.remove()
 
-    topic = "user:" <> to_string(token.user_id)
-
-    AccountsWeb.Endpoint.broadcast(topic, token.type, %{
+    AccountsWeb.Endpoint.broadcast("token:" <> to_string(token.id), "used", %{
       token: token,
       user: token.user
     })

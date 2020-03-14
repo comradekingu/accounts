@@ -19,22 +19,15 @@ defmodule AccountsWeb.ConnCase do
 
   using do
     quote do
-      # Import conveniences for testing with connections
       use Phoenix.ConnTest
+
       alias AccountsWeb.Router.Helpers, as: Routes
 
-      # The default endpoint for testing
       @endpoint AccountsWeb.Endpoint
     end
   end
 
-  setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Accounts.Repo)
-
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Accounts.Repo, {:shared, self()})
-    end
-
+  setup do
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end
